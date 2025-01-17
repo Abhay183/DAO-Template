@@ -3,16 +3,16 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import HomePage from './components/HomePage/HomePage';
 import DaoModal from './components/DaoModal/DaoModal';
-import GovernanceForm from './components/DaoForm/GovernanceForm';
-import InvestmentForm from './components/DaoForm/InvestmentForm';
-import CharityForm from './components/DaoForm/CharityForm';
-import NftCollectorForm from './components/DaoForm/NftCollectorForm';
-import ServiceForm from './components/DaoForm/ServiceForm';
-import DaoTemplate from './components/DaoTemplate/DaoTemplate';
+import BuildDao from './components/BuildDao';
+import SelectBlockchain from './components/SelectBlockchain';
+import DescribeDao from './components/DescribeDao';
+import DefineMembership from './components/DefineMembership';
+import SelectSettings from './components/SelectSettings';
+import DaoPreview from './components/DaoPreview';
 import GlobalStyles from './GlobalStyles';
-import SplitLayout from './components/DaoForm/SplitLayout';
 
 const AppContainer = styled.div`
+  width: 98vw;
   min-height: 100vh;
   background: ${props => 
     props.$isForm ? 
@@ -28,44 +28,28 @@ const App = () => {
     switch (currentStep) {
       case 'selection':
         return <HomePage />;
-      case 'form':
-        let FormComponent;
-        switch (selectedDao) {
-          case 'governance':
-            FormComponent = GovernanceForm;
-            break;
-          case 'investment':
-            FormComponent = InvestmentForm;
-            break;
-          case 'charity':
-            FormComponent = CharityForm;
-            break;
-          case 'nft':
-            FormComponent = NftCollectorForm;
-            break;
-          case 'service':
-            FormComponent = ServiceForm;
-            break;
-          default:
-            return <HomePage />;
-        }
-        return (
-          <SplitLayout>
-            <FormComponent />
-          </SplitLayout>
-        );
-      case 'template':
-        return <DaoTemplate />;
+      case 'build':
+        return <BuildDao />;
+      case 'blockchain':
+        return <SelectBlockchain />;
+      case 'describe':
+        return <DescribeDao />;
+      case 'membership':
+        return <DefineMembership />;
+      case 'settings':
+        return <SelectSettings />;
+      case 'review':
+        return <DaoPreview />
       default:
         return <HomePage />;
     }
   };
 
   return (
-    <AppContainer $isForm={currentStep === 'form'}>
+    <AppContainer $isForm={currentStep !== 'selection'}>
       <GlobalStyles />
       {renderCurrentStep()}
-      <DaoModal />
+      {selectedDao !== 'custom' && <DaoModal />}
     </AppContainer>
   );
 };

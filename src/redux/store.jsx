@@ -5,4 +5,8 @@ export const store = configureStore({
   reducer: {
     dao: daoReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });

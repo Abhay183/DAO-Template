@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { closeModal, setCurrentStep } from '../../redux/daoSlice';
+import photo from '../../assets/dao-img.webp';
 import {
   ModalOverlay,
   ModalContent,
@@ -10,55 +11,58 @@ import {
   DaoTitle,
   DaoDescription,
   ContinueButton,
-  CloseButton
+  CloseButton,
+  MobileOnlyDaoTitle
 } from './DaoModal.styles';
 
 const daoInfo = {
   governance: {
     title: 'Governance DAO',
     description: 'Create a decentralized organization focused on community-driven decision making and protocol governance.',
-    image: '/images/governance-dao.png'
+    image: photo
   },
   investment: {
     title: 'Investment DAO',
     description: 'Build a collective investment vehicle for crypto assets and DeFi opportunities.',
-    image: '/images/investment-dao.png'
+    image: photo
   },
   charity: {
     title: 'Charity DAO',
     description: 'Establish a transparent and efficient platform for charitable giving and social impact.',
-    image: '/images/charity-dao.png'
+    image: photo
   },
   nft: {
     title: 'NFT Collector DAO',
     description: 'Create a collective for curating, collecting, and managing valuable NFT assets.',
-    image: '/images/nft-dao.png'
+    image: photo
   },
   service: {
     title: 'Service DAO',
     description: 'Build a decentralized service marketplace with shared ownership and governance.',
-    image: '/images/service-dao.png'
+    image: photo
   }
 };
 
 const DaoModal = () => {
   const dispatch = useDispatch();
   const { selectedDao, modalOpen } = useSelector(state => state.dao);
-  
+
   const handleContinue = () => {
-    dispatch(setCurrentStep('form'));
     dispatch(closeModal());
+    dispatch(setCurrentStep('build'));
   };
 
-  if (!modalOpen) return null;
+  if (!modalOpen || selectedDao === 'custom') return null;
 
   const dao = daoInfo[selectedDao];
+  if (!dao) return null;
 
   return (
     <ModalOverlay>
       <ModalContent>
         <CloseButton onClick={() => dispatch(closeModal())}>×</CloseButton>
         <ImageSection>
+          <MobileOnlyDaoTitle>{dao.title}</MobileOnlyDaoTitle>
           <DaoImage src={dao.image} alt={dao.title} />
         </ImageSection>
         <ContentSection>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { setSelectedDao } from '../../redux/daoSlice';
+import { setSelectedDao, setCurrentStep } from '../../redux/daoSlice';
 import { DAO_TYPES } from '../../constants/daoTypes';
 import {
   HomePageContainer,
@@ -20,7 +20,12 @@ const HomePage = () => {
   const dispatch = useDispatch();
 
   const handleDaoSelect = (daoType) => {
-    dispatch(setSelectedDao(daoType));
+    if (daoType === 'custom') {
+      dispatch(setSelectedDao(daoType));
+      dispatch(setCurrentStep('build'));
+    } else {
+      dispatch(setSelectedDao(daoType));
+    }
   };
 
   return (

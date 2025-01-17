@@ -68,5 +68,19 @@ export const DAO_TYPES = {
             { name: 'providerRequirements', label: 'Provider Requirements', type: 'text' },
             { name: 'disputeResolution', label: 'Dispute Resolution Process', type: 'text' }
         ]
+    },
+    CUSTOM: {
+        id: 'custom',
+        name: 'Custom DAO',
+        description: 'Build your own DAO.',
+        color: '#3498db',
+        icon: '+',
+        fields: [
+            { name: 'daoName', label: 'DAO Name', type: 'text' },
+            { name: 'serviceType', label: 'Service Type', type: 'text' },
+            { name: 'serviceFee', label: 'Service Fee (%)', type: 'number' },
+            { name: 'providerRequirements', label: 'Provider Requirements', type: 'text' },
+            { name: 'disputeResolution', label: 'Dispute Resolution Process', type: 'text' }
+        ]
     }
 };
