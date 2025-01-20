@@ -62,10 +62,6 @@ const LearnMore = styled.a`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-
-  &:hover {
-    text-decoration: underline;
-  }
 `;
 
 const NetworkSelector = styled.div`
@@ -133,6 +129,28 @@ const Radio = styled.input`
   width: 20px;
   height: 20px;
   margin-left: 1rem;
+  appearance: none;
+  border: 2px solid #000000;
+  border-radius: 50%;
+  background-color: white;
+  position: relative;
+  cursor: pointer;
+
+  &:checked {
+    border-color: #CA1111;
+  }
+
+  &:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #CA1111;
+  }
 `;
 
 const Navigation = styled.div`

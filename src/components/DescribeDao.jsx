@@ -62,10 +62,6 @@ const LearnMore = styled.a`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-
-  &:hover {
-    text-decoration: underline;
-  }
 `;
 
 const Form = styled.form`
@@ -91,7 +87,7 @@ const Input = styled.input`
   border-radius: 0.5rem;
   font-size: 1rem;
   width: 100%;
-  background: none;
+  background-color: white;
   color: black;
 
   &:focus {
@@ -134,18 +130,66 @@ const FileInput = styled.div`
   border-radius: 0.5rem;
   text-align: center;
   cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: white;
+  width: 100%;
+  max-width: 300px;
+  position: relative;
   
   &:hover {
     border-color: #CA1111;
+    background-color: rgba(202, 17, 17, 0.02);
   }
 
-  p:first-child {
-    margin-bottom: 0.5rem;
+  input[type="file"] {
+    display: none;
   }
+`;
 
-  p:last-child {
-    color: #64748b;
-    font-size: 0.875rem;
+const UploadIcon = styled.div`
+  font-size: 2rem;
+  color: #64748b;
+  margin-bottom: 1rem;
+`;
+
+const UploadText = styled.div`
+  p {
+    margin: 0;
+    
+    &:first-child {
+      color: #0b1b27;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    
+    &:last-child {
+      color: #64748b;
+      font-size: 0.875rem;
+    }
+  }
+`;
+
+const PreviewContainer = styled.div`
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 1;
+  position: relative;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
   }
 `;
 
@@ -157,7 +201,7 @@ const TextArea = styled.textarea`
   width: 100%;
   min-height: 120px;
   resize: vertical;
-  background: none;
+  background-color: white;
   color: black;
   
   &:focus {
@@ -181,6 +225,7 @@ const AddLink = styled.button`
   cursor: pointer;
   font-weight: 600;
   padding: 0;
+  text-align: end;
 `;
 
 const Navigation = styled.div`
@@ -221,6 +266,16 @@ const SubText = styled.p`
   margin-top: 0.25rem;
 `;
 
+const ErrorMessage = styled.div`
+  color: #CA1111;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+`;
+
+const FormGroupWrapper = styled.div`
+  scroll-margin-top: 140px; // This creates space from the header when scrolling
+`;
+
 const DescribeDao = () => {
   const dispatch = useDispatch();
   const [formState, setFormState] = useState({
@@ -231,12 +286,7 @@ const DescribeDao = () => {
     links: [{ name: '', url: '' }]
   });
 
-  const handleFormChange = (e) => {
-    setFormState({
-      ...formState,
-      [e.target.name]: e.target.value
-    });
-  };
+  const [preview, setPreview] = useState(null);
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -245,12 +295,68 @@ const DescribeDao = () => {
         ...formState,
         logo: file
       });
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
+  const removeLogo = () => {
+    setFormState({
+      ...formState,
+      logo: null
+    });
+    setPreview(null);
+  };
+
+  const handleFormChange = (e) => {
+    setFormState({
+      ...formState,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const [errors, setErrors] = useState({
+    name: false,
+    subdomain: false,
+    description: false
+  });
+
   const handleNext = (e) => {
     e.preventDefault();
-    // Dispatch both formData and daoInfo
+
+    // Reset errors
+    setErrors({
+      name: false,
+      subdomain: false,
+      description: false
+    });
+
+    let hasErrors = false;
+    const newErrors = {
+      name: !formState.name.trim(),
+      subdomain: !formState.subdomain.trim(),
+      description: !formState.description.trim()
+    };
+
+    // Check if there are any errors
+    if (Object.values(newErrors).some(error => error)) {
+      hasErrors = true;
+      setErrors(newErrors);
+
+      // Find first error and scroll to it
+      const firstErrorField = Object.keys(newErrors).find(key => newErrors[key]);
+      const errorElement = document.getElementById(firstErrorField);
+      if (errorElement) {
+        errorElement.scrollIntoView({ behavior: 'smooth' });
+      }
+      return;
+    }
+
+    // If no errors, proceed with form submission
     dispatch(setFormData(formState));
     dispatch(updateDaoInfo({
       name: formState.name,
@@ -261,6 +367,7 @@ const DescribeDao = () => {
     }));
     dispatch(setCurrentStep('membership'));
   };
+
 
   const handleLinkChange = (index, field, value) => {
     const newLinks = [...formState.links];
@@ -275,35 +382,6 @@ const DescribeDao = () => {
     });
   };
 
-  // const handleNext = (e) => {
-  //   e.preventDefault();
-  //   // Dispatch DAO info before moving to next step
-  //   dispatch(updateDaoInfo({
-  //     name: formState.name,
-  //     subdomain: formState.subdomain,
-  //     description: formState.description,
-  //     logo: formState.logo,
-  //     links: formState.links.filter(link => link.name && link.url)
-  //   }));
-  //   dispatch(setCurrentStep('membership'));
-  // };
-
-  // Update FileInput component to handle actual file upload
-  const FileInputComponent = () => (
-    <FileInput>
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleFileUpload}
-        style={{ display: 'none' }}
-        id="logo-upload"
-      />
-      <label htmlFor="logo-upload" style={{ cursor: 'pointer' }}>
-        <p>Click to upload or drag and drop</p>
-        <p>PNG, JPG, or GIF (max. 3MB)</p>
-      </label>
-    </FileInput>
-  );
 
   const handleBack = () => {
     dispatch(setCurrentStep('blockchain'));
@@ -331,58 +409,98 @@ const DescribeDao = () => {
         </div>
 
         <Form onSubmit={handleNext}>
-          <FormGroup>
-            <Label>Name</Label>
-            <SubText>Maximum of 128 characters</SubText>
-            <div>
-              <Input
-                type="text"
-                name="name"
-                value={formState.name}
-                onChange={handleFormChange}
-                placeholder="Type your DAO's name..."
-                maxLength="128"
-                required="true"
-              />
-              <CharCount>{formState.name.length}/128</CharCount>
-            </div>
-          </FormGroup>
+          <FormGroupWrapper id="name">
+            <FormGroup>
+              <Label>Name</Label>
+              <SubText>Maximum of 128 characters</SubText>
+              <div>
+                <Input
+                  type="text"
+                  name="name"
+                  value={formState.name}
+                  onChange={handleFormChange}
+                  placeholder="Type your DAO's name..."
+                  maxLength="128"
+                  aria-invalid={errors.name}
+                  style={{ borderColor: errors.name ? '#CA1111' : undefined }}
+                />
+                <CharCount>{formState.name.length}/128</CharCount>
+                {errors.name && (
+                  <ErrorMessage>Please enter your DAO's name</ErrorMessage>
+                )}
+              </div>
+            </FormGroup>
+          </FormGroupWrapper>
 
-          <FormGroup>
-            <Label>ENS Subdomain</Label>
-            <SubText>This will be your DAO's unique ENS subdomain, created automatically for you. Lowercase letters, numbers, and the dash "-" are all acceptable characters.</SubText>
-            <SubdomainInput>
-              <Input
-                type="text"
-                name="subdomain"
-                value={formState.subdomain}
-                onChange={handleFormChange}
-                placeholder="your-dao"
-                required="true"
-              />
-              <SubdomainSuffix>.dao.eth</SubdomainSuffix>
-            </SubdomainInput>
-          </FormGroup>
+          <FormGroupWrapper id="subdomain">
+            <FormGroup>
+              <Label>ENS Subdomain</Label>
+              <SubText>This will be your DAO's unique ENS subdomain, created automatically for you. Lowercase letters, numbers, and the dash "-" are all acceptable characters.</SubText>
+              <SubdomainInput>
+                <Input
+                  type="text"
+                  name="subdomain"
+                  value={formState.subdomain}
+                  onChange={handleFormChange}
+                  placeholder="your-dao"
+                  aria-invalid={errors.subdomain}
+                  style={{ borderColor: errors.subdomain ? '#CA1111' : undefined }}
+                />
+                <SubdomainSuffix>.dao.eth</SubdomainSuffix>
+              </SubdomainInput>
+              {errors.subdomain && (
+                <ErrorMessage>Please enter an ENS subdomain</ErrorMessage>
+              )}
+            </FormGroup>
+          </FormGroupWrapper>
 
           <FormGroup>
             <Label>Logo (Optional)</Label>
-            <FileInput>
-              <p>Click to upload or drag and drop</p>
-              <p>PNG, JPG, or GIF (max. 3MB)</p>
-            </FileInput>
+            <SubText>Upload a logo to help people recognize your DAO.</SubText>
+
+            {preview ? (
+              <PreviewContainer>
+                <img src={preview} alt="Logo preview" />
+                <button type="button" onClick={removeLogo}>
+                  ✕
+                </button>
+              </PreviewContainer>
+            ) : (
+              <FileInput>
+                <input
+                  type="file"
+                  id="logo-upload"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                />
+                <label htmlFor="logo-upload">
+                  <UploadIcon>+</UploadIcon>
+                  <UploadText>
+                    <p>Click to upload or drag and drop</p>
+                    <p>PNG, JPG, or GIF (max. 3MB)</p>
+                  </UploadText>
+                </label>
+              </FileInput>
+            )}
           </FormGroup>
 
-          <FormGroup>
-            <Label>Description</Label>
-            <SubText>Describe your DAO's purpose in a few sentences. This is listed on the Explore page so new contributors can find you.</SubText>
-            <TextArea
-              name="description"
-              value={formState.description}
-              onChange={handleFormChange}
-              placeholder="Type your summary..."
-              required="true"
-            />
-          </FormGroup>
+          <FormGroupWrapper id="description">
+            <FormGroup>
+              <Label>Description</Label>
+              <SubText>Describe your DAO's purpose in a few sentences. This is listed on the Explore page so new contributors can find you.</SubText>
+              <TextArea
+                name="description"
+                value={formState.description}
+                onChange={handleFormChange}
+                placeholder="Type your summary..."
+                aria-invalid={errors.description}
+                style={{ borderColor: errors.description ? '#CA1111' : undefined }}
+              />
+              {errors.description && (
+                <ErrorMessage>Please enter a description</ErrorMessage>
+              )}
+            </FormGroup>
+          </FormGroupWrapper>
 
           <FormGroup>
             <Label>Links (Optional)</Label>

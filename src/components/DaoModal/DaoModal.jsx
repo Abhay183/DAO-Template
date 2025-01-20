@@ -69,7 +69,7 @@ const DaoModal = () => {
           <DaoTitle>{dao.title}</DaoTitle>
           <DaoDescription>{dao.description}</DaoDescription>
           <ContinueButton onClick={handleContinue}>
-            Continue to Setup
+            <span>Continue to Setup</span>
           </ContinueButton>
         </ContentSection>
       </ModalContent>

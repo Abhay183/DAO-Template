@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { ChevronDown, Menu, X } from 'lucide-react';
+import { ChevronDown, Menu, X, Bell, Settings, LogOut, HelpCircle } from 'lucide-react';
+
 
 const HeaderContainer = styled.header`
   padding: 1rem 2rem;
@@ -14,9 +15,83 @@ const HeaderContainer = styled.header`
   left: 0;
   right: 0;
   z-index: 1000;
+  transition: box-shadow 0.3s ease;
+  
+  ${props => props.scrolled && `
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  `}
 
   button:focus {
     outline: none;
+  }
+`;
+
+const Dropdown = styled.div`
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+  z-index: 1000;
+  opacity: ${props => props.isOpen ? 1 : 0};
+  visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
+  transform: translateY(${props => props.isOpen ? '0' : '-10px'});
+  transition: all 0.2s ease;
+`;
+
+const DropdownItem = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: none;
+  color: #64748b;
+  cursor: pointer;
+  text-align: left;
+  
+  &:hover {
+    background: #f8fafc;
+    color: #0b1b27;
+  }
+`;
+
+const Divider = styled.div`
+  height: 1px;
+  background: #e2e8f0;
+  margin: 0.5rem 0;
+`;
+
+const NotificationBadge = styled.span`
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #CA1111;
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: 1rem;
+  border: 2px solid white;
+`;
+
+const WalletInfo = styled.div`
+  text-align: left;
+  padding: 0.75rem 1rem;
+  
+  p {
+    margin: 0;
+    &:first-child {
+      color: #0b1b27;
+      font-weight: 500;
+    }
+    &:last-child {
+      color: #64748b;
+      font-size: 0.875rem;
+    }
   }
 `;
 
@@ -201,70 +276,154 @@ const MobileFeedbackButton = styled(FeedbackButton)`
 `;
 
 const TopHeader = () => {
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [headerHeight, setHeaderHeight] = useState(0);
-    const headerRef = React.useRef(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [walletOpen, setWalletOpen] = useState(false);
+  const [activeLink, setActiveLink] = useState('Dashboard');
+  const [notifications, setNotifications] = useState(3);
+  const headerRef = useRef(null);
+  const feedbackRef = useRef(null);
+  const walletRef = useRef(null);
 
-    React.useEffect(() => {
-        if (headerRef.current) {
-            setHeaderHeight(headerRef.current.offsetHeight);
-        }
-    }, []);
+  useEffect(() => {
+    if (headerRef.current) {
+      setHeaderHeight(headerRef.current.offsetHeight);
+    }
+
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 0);
+    };
+
+    const handleClickOutside = (event) => {
+      if (feedbackRef.current && !feedbackRef.current.contains(event.target)) {
+        setFeedbackOpen(false);
+      }
+      if (walletRef.current && !walletRef.current.contains(event.target)) {
+        setWalletOpen(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
     };
 
     const navLinks = [
-        { name: 'Dashboard', href: '#', active: true },
-        { name: 'Governance', href: '#', active: false },
-        { name: 'Finance', href: '#', active: false },
-        { name: 'Members', href: '#', active: false },
-        { name: 'Settings', href: '#', active: false },
+      { name: 'Dashboard', href: '#' },
+      { name: 'Governance', href: '#' },
+      { name: 'Finance', href: '#' },
+      { name: 'Members', href: '#' },
+      { name: 'Settings', href: '#' },
     ];
 
+    const handleLinkClick = (name) => {
+      setActiveLink(name);
+      setIsMobileMenuOpen(false);
+    };
+  
+    const handleFeedback = (type) => {
+      console.log(`Feedback type: ${type}`);
+      setFeedbackOpen(false);
+    };
+  
+    const handleWalletAction = (action) => {
+      console.log(`Wallet action: ${action}`);
+      setWalletOpen(false);
+    };
+
     return (
-        <HeaderContainer ref={headerRef}>
-            <LeftSection>
-                <Logo />
-                <MobileMenuButton onClick={toggleMobileMenu}>
-                    {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                </MobileMenuButton>
-                <Navigation>
-                    {navLinks.map((link, index) => (
-                        <NavLink key={index} href={link.href} active={link.active}>
-                            {link.name}
-                        </NavLink>
-                    ))}
-                </Navigation>
-            </LeftSection>
-
-            <RightSection>
-                <FeedbackButton>
-                    Give feedback
-                    <ChevronDown size={16} />
-                </FeedbackButton>
-                <WalletButton>
-                    <span>Connect</span>
-                    <Avatar />
-                </WalletButton>
-            </RightSection>
-
-            <MobileNav isOpen={isMobileMenuOpen} headerHeight={headerHeight}>
-                {navLinks.map((link, index) => (
-                    <NavLink key={index} href={link.href} active={link.active}>
-                        {link.name}
-                    </NavLink>
-                ))}
-                <MobileRightSection>
-                    <MobileFeedbackButton>
-                        Give feedback
-                        <ChevronDown size={16} />
-                    </MobileFeedbackButton>
-                </MobileRightSection>
-            </MobileNav>
-        </HeaderContainer>
+      <HeaderContainer ref={headerRef} scrolled={isScrolled}>
+        <LeftSection>
+          <Logo />
+          <MobileMenuButton onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </MobileMenuButton>
+          <Navigation>
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.name}
+                href={link.href}
+                active={activeLink === link.name}
+                onClick={() => handleLinkClick(link.name)}
+              >
+                {link.name}
+              </NavLink>
+            ))}
+          </Navigation>
+        </LeftSection>
+  
+        <RightSection>
+          <div ref={feedbackRef} style={{ position: 'relative' }}>
+            <FeedbackButton onClick={() => setFeedbackOpen(!feedbackOpen)}>
+              Give feedback
+              <ChevronDown size={16} style={{ transform: feedbackOpen ? 'rotate(180deg)' : 'none' }} />
+            </FeedbackButton>
+            <Dropdown isOpen={feedbackOpen}>
+              <DropdownItem onClick={() => handleFeedback('suggestion')}>
+                <HelpCircle size={16} />
+                Suggestion
+              </DropdownItem>
+              <DropdownItem onClick={() => handleFeedback('bug')}>
+                <Bell size={16} />
+                Report a bug
+                {notifications > 0 && <NotificationBadge>{notifications}</NotificationBadge>}
+              </DropdownItem>
+            </Dropdown>
+          </div>
+  
+          <div ref={walletRef} style={{ position: 'relative' }}>
+            <WalletButton onClick={() => setWalletOpen(!walletOpen)}>
+              <span>0x1234...5678</span>
+              <Avatar />
+            </WalletButton>
+            <Dropdown isOpen={walletOpen}>
+              <WalletInfo>
+                <p>Connected Wallet</p>
+                <p>0x1234...5678</p>
+              </WalletInfo>
+              <Divider />
+              <DropdownItem onClick={() => handleWalletAction('settings')}>
+                <Settings size={16} />
+                Settings
+              </DropdownItem>
+              <DropdownItem onClick={() => handleWalletAction('disconnect')}>
+                <LogOut size={16} />
+                Disconnect
+              </DropdownItem>
+            </Dropdown>
+          </div>
+        </RightSection>
+  
+        <MobileNav isOpen={isMobileMenuOpen} headerHeight={headerHeight}>
+          {navLinks.map((link) => (
+            <NavLink
+              key={link.name}
+              href={link.href}
+              active={activeLink === link.name}
+              onClick={() => handleLinkClick(link.name)}
+            >
+              {link.name}
+            </NavLink>
+          ))}
+          <MobileRightSection>
+            <MobileFeedbackButton onClick={() => handleFeedback('mobile')}>
+              Give feedback
+              <ChevronDown size={16} />
+            </MobileFeedbackButton>
+          </MobileRightSection>
+        </MobileNav>
+      </HeaderContainer>
     );
-};
-
-export default TopHeader;
+  };
+  
+  export default TopHeader;

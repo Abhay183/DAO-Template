@@ -1,140 +1,158 @@
+
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { setCurrentStep } from '../redux/daoSlice';
 import styled from 'styled-components';
 import TopHeader from './Header';
+import { BlockchainIcon, TagsIcon, MembersIcon, SettingsIcon } from './StepIcons';
+
 
 const BuildDaoContainer = styled.div`
-  padding: 4rem 2rem;
+  padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
-  animation: fadeIn 0.6s ease;
+  background: #f8fafc;
+  min-height: 100vh;
   margin-top: 80px;
 
   button:focus {
     outline: none;
   }
-
-  @media (max-width: 768px) {
-    padding: 2rem 1rem;
-  }
 `;
 
 const Header = styled.div`
   background: white;
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   padding: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease;
-  margin-bottom: 4rem;
+  margin-bottom: 2rem;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
   @media (max-width: 768px) {
-    display: block;
+    flex-direction: column;
+    gap: 1.5rem;
   }
 `;
 
 const Title = styled.h1`
-  font-size: 3.5rem;
-  color: #0b1b27;
-  margin-bottom: 1rem;
-  font-weight: 700;
+  font-size: 2.5rem;
+  color: #1a2b3b;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
 
   @media (max-width: 768px) {
-    font-size: 2.5rem;
-  }
-`;
-
-const StepsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
-  margin-top: 3rem;
-`;
-
-const StepCard = styled.div`
-  background: white;
-  border-radius: 1rem;
-  padding: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease;
-
-  &:hover {
-    transform: translateY(-4px);
+    font-size: 2rem;
   }
 `;
 
 const Subtitle = styled.p`
-  font-size: 1.25rem;
-  color: #183B56;
+  font-size: 1rem;
+  color: #64748b;
   max-width: 600px;
 `;
 
+const StepsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const StepCard = styled.div`
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+`;
+
 const StepIcon = styled.div`
-  width: 48px;
-  height: 48px;
-  margin-bottom: 1.5rem;
-  color: #CA1111;
+  margin-bottom: 0.5rem;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
 `;
 
 const StepNumber = styled.span`
   font-size: 0.875rem;
-  color: #CA1111;
-  font-weight: 600;
+  color: #64748b;
+  font-weight: 500;
   margin-bottom: 0.5rem;
   display: block;
 `;
 
 const StepTitle = styled.h3`
-  font-size: 1.25rem;
-  color: #0b1b27;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
+  font-size: 1.2rem;
+  color: #1a2b3b;
+  margin-bottom: 0;
+  font-weight: 500;
 `;
 
 const StartButton = styled.button`
   background: #CA1111;
   color: white;
-  padding: 1rem 2rem;
+  padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
-  font-weight: 600;
+  font-weight: 500;
   border: none;
   cursor: pointer;
-  transition: background 0.2s ease;
-  margin-top: 4rem;
-  font-size: 1.125rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
 
   &:hover {
-    background: #a30d0d;
+    background: #CA1111;
+  }
+
+  &::after {
+    content: "›";
+    font-size: 1.25rem;
+    margin-left: 0.25rem;
   }
 `;
 
+// Update the steps array
+const steps = [
+  {
+    number: 'Step 1',
+    title: 'Select blockchain',
+    icon: <BlockchainIcon />
+  },
+  {
+    number: 'Step 2',
+    title: 'Describe your DAO',
+    icon: <TagsIcon />
+  },
+  {
+    number: 'Step 3',
+    title: 'Define membership',
+    icon: <MembersIcon />
+  },
+  {
+    number: 'Step 4',
+    title: 'Select governance settings',
+    icon: <SettingsIcon />
+  }
+];
+
+// Update the BuildDao component to include the SVG definitions
 const BuildDao = () => {
   const dispatch = useDispatch();
-
-  const steps = [
-    {
-      number: 'Step 1',
-      title: 'Select blockchain',
-      icon: '🔗'
-    },
-    {
-      number: 'Step 2',
-      title: 'Describe your DAO',
-      icon: '✍️'
-    },
-    {
-      number: 'Step 3',
-      title: 'Define membership',
-      icon: '👥'
-    },
-    {
-      number: 'Step 4',
-      title: 'Select governance settings',
-      icon: '⚙️'
-    }
-  ];
 
   const handleStart = () => {
     dispatch(setCurrentStep('blockchain'));
@@ -144,8 +162,14 @@ const BuildDao = () => {
     <>
       <TopHeader />
       <BuildDaoContainer>
+        
+        {/* Include the SVG definitions */}
+        <svg style={{ display: 'none' }}>
+          <use href="#step-icons" />
+        </svg>
+
         <Header>
-          <div className='heading'>
+          <div>
             <Title>Build your DAO</Title>
             <Subtitle>
               Start simple and learn as you go. You can always evolve your DAO in the future.
@@ -157,9 +181,13 @@ const BuildDao = () => {
         <StepsGrid>
           {steps.map((step, index) => (
             <StepCard key={index}>
-              <StepIcon>{step.icon}</StepIcon>
-              <StepNumber>{step.number}</StepNumber>
-              <StepTitle>{step.title}</StepTitle>
+              <StepIcon>
+                <svg viewBox="0 0 100 100">{step.icon}</svg>
+              </StepIcon>
+              <div>
+                <StepNumber>{step.number}</StepNumber>
+                <StepTitle>{step.title}</StepTitle>
+              </div>
             </StepCard>
           ))}
         </StepsGrid>

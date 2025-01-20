@@ -15,6 +15,10 @@ const PageContainer = styled.div`
   button:focus {
     outline: none;
   }
+
+  @media (max-width: 768px) {
+    padding: 0;
+  }
 `;
 
 const Progress = styled.div`
@@ -67,10 +71,10 @@ const Form = styled.form`
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  background: white;
+  // background: white;
   border-radius: 1rem;
   padding: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  // box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 `;
 
 const FormGroup = styled.div`
@@ -91,13 +95,13 @@ const SubLabel = styled.p`
   margin-bottom: 0.5rem;
 `;
 
+
 const InfoText = styled.div`
   display: flex;
   align-items: start;
   gap: 0.5rem;
-  color: #CA1111;
+  color: ${props => props.warning ? '#CA1111' : '#64748b'};
   font-size: 0.875rem;
-  margin-top: 0.5rem;
 
   svg {
     flex-shrink: 0;
@@ -181,7 +185,7 @@ const NumberValue = styled.input`
   text-align: center;
   border: none;
   padding: 0.5rem;
-  background: none;
+  background-color: white;
   color: black;
   
   &::-webkit-inner-spin-button,
@@ -250,7 +254,7 @@ const Button = styled.button`
   cursor: pointer;
   transition: all 0.2s ease;
 
-  ${props => props.primary ? `
+  ${props => props.isPrimary ? `
     background: #CA1111;
     color: white;
     border: none;
@@ -274,12 +278,17 @@ const SelectSettings = () => {
   const [settings, setSettings] = useState({
     supportThreshold: 50,
     minParticipation: 15,
-    minDuration: { days: 1, hours: 0, minutes: 0 },
+    minDuration: { days: 0, hours: 1, minutes: 0 },
     earlyExecution: true,
     voteChange: false,
     proposalCreation: 'members',
     minimumTokens: 1
   });
+
+  const isOneHourDuration = () => {
+    const { days, hours, minutes } = settings.minDuration;
+    return days === 0 && hours === 1 && minutes === 0;
+  };
 
   const handleDurationChange = (field, value) => {
     const newValue = Math.max(0, value);
@@ -289,6 +298,15 @@ const SelectSettings = () => {
         ...prev.minDuration,
         [field]: newValue
       }
+    }));
+  };
+
+  const handleEarlyExecutionChange = (value) => {
+    setSettings(prev => ({
+      ...prev,
+      earlyExecution: value,
+      // If early execution is enabled, force vote change to false
+      voteChange: value ? false : prev.voteChange
     }));
   };
 
@@ -344,9 +362,11 @@ const SelectSettings = () => {
                 </SliderValue>
               </SliderGroup>
             </SliderContainer>
-            <InfoText>
+            <InfoText warning={settings.supportThreshold < 50}>
               <Info size={16} />
-              Proposal will be approved by majority
+              {settings.supportThreshold < 50 
+                ? "Proposals could be approved by a minority rather than a majority."
+                : "Proposal will be approved by majority"}
             </InfoText>
           </FormGroup>
 
@@ -419,7 +439,9 @@ const SelectSettings = () => {
             </DurationGroup>
             <InfoText>
               <Info size={16} />
-              Set this to a duration that is long enough for your members to have sufficient time to vote. It's recommended to set this to at least 1 day.
+              {isOneHourDuration() 
+                ? "The minimum duration is one hour."
+                : "Set this to a duration that is long enough for your members to have sufficient time to vote. It's recommended to set this to at least 1 day."}
             </InfoText>
           </FormGroup>
 
@@ -431,14 +453,14 @@ const SelectSettings = () => {
             <RadioGroup>
               <RadioButton
                 isSelected={settings.earlyExecution}
-                onClick={() => setSettings(prev => ({ ...prev, earlyExecution: true }))}
+                onClick={() => handleEarlyExecutionChange(true)}
                 type="button"
               >
                 Yes
               </RadioButton>
               <RadioButton
                 isSelected={!settings.earlyExecution}
-                onClick={() => setSettings(prev => ({ ...prev, earlyExecution: false }))}
+                onClick={() => handleEarlyExecutionChange(false)}
                 type="button"
               >
                 No
@@ -453,14 +475,15 @@ const SelectSettings = () => {
             </SubLabel>
             <RadioGroup>
               <RadioButton
-                type='button'
-                selected={!settings.voteChange}
+                type="button"
+                isSelected={!settings.voteChange}
                 onClick={() => setSettings(prev => ({ ...prev, voteChange: false }))}
               >
                 No
               </RadioButton>
               <RadioButton
-                selected={settings.voteChange}
+                type="button"
+                isSelected={settings.voteChange}
                 onClick={() => setSettings(prev => ({ ...prev, voteChange: true }))}
                 disabled={settings.earlyExecution}
               >

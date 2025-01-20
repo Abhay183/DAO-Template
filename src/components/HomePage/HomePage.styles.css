@@ -1,0 +1,261 @@
+.dao-app {
+  min-height: 100vh;
+  background: #ffffff;
+  color: #333333;
+  position: relative;
+
+  button:focus {
+    outline: none;
+  }
+}
+
+.background-shapes {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.shape {
+  position: absolute;
+  opacity: 0.1;
+}
+
+/* .shape-1 {
+  width: 600px;
+  height: 600px;
+  background: #CA1111;
+  top: -20%;
+  right: -10%;
+  border-radius: 50%;
+  filter: blur(80px);
+} */
+
+.shape-2 {
+  width: 500px;
+  height: 500px;
+  background: #f3f3f3;
+  bottom: -10%;
+  left: -10%;
+  border-radius: 50%;
+  filter: blur(60px);
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+}
+
+.hero {
+  margin-bottom: 6rem;
+}
+
+.hero-title {
+  font-size: 5rem;
+  font-weight: 800;
+  color: #333333;
+  margin-bottom: 2rem;
+  position: relative;
+  line-height: 1.2;
+}
+
+.hero-title::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -10px;
+  width: 100px;
+  height: 4px;
+  background: #CA1111;
+}
+
+.hero-subtitle {
+  font-size: 1.5rem;
+  color: #666666;
+}
+
+.dao-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.dao-item {
+  display: flex;
+  gap: 3rem;
+  padding: 3rem;
+  background: #f3f3f3;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s ease;
+}
+
+.dao-item:nth-child(even) {
+  flex-direction: row-reverse;
+}
+
+.dao-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, #CA1111 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.dao-item:hover::before {
+  opacity: 0.05;
+}
+
+.dao-icon-wrapper {
+  flex: 0 0 200px;
+  position: relative;
+}
+
+.dao-icon {
+  width: 120px;
+  height: 120px;
+  background: #ffffff;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  color: #CA1111;
+  position: relative;
+  transition: transform 0.4s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dao-icon::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 30px;
+  background: linear-gradient(45deg, #CA1111, #f3f3f3);
+  z-index: -1;
+  opacity: 0.5;
+}
+
+.dao-item:hover .dao-icon {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+.dao-content {
+  flex: 1;
+  position: relative;
+}
+
+.dao-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #333333;
+  margin-bottom: 1rem;
+}
+
+.dao-description {
+  font-size: 1.1rem;
+  color: #666666;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.dao-button {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  background: #CA1111;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.dao-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.dao-button:hover::before {
+  left: 100%;
+}
+
+.dao-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(202, 17, 17, 0.2);
+  background: #b50f0f;
+}
+
+@media (max-width: 1024px) {
+  .hero-title {
+    font-size: 4rem;
+  }
+  
+  .dao-item {
+    padding: 2rem;
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 3rem;
+  }
+  
+  .dao-item,
+  .dao-item:nth-child(even) {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .dao-icon-wrapper {
+    flex: 0 0 auto;
+  }
+  
+  .dao-title {
+    font-size: 2rem;
+  }
+  
+  .dao-description {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .content {
+    padding: 2rem 1rem;
+  }
+  
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.2rem;
+  }
+}

@@ -2,19 +2,7 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { setSelectedDao, setCurrentStep } from '../../redux/daoSlice';
 import { DAO_TYPES } from '../../constants/daoTypes';
-import {
-  HomePageContainer,
-  Header,
-  Title,
-  Subtitle,
-  CardsGrid,
-  DaoCard,
-  CardIcon,
-  CardTitle,
-  CardDescription,
-  CardButton,
-  GradientOverlay
-} from './HomePage.styles';
+import './HomePage.styles.css';
 
 const HomePage = () => {
   const dispatch = useDispatch();
@@ -29,26 +17,45 @@ const HomePage = () => {
   };
 
   return (
-    <HomePageContainer>
-      <Header>
-        <Title>Welcome to DAO Platform</Title>
-        <Subtitle>Choose your DAO type to get started</Subtitle>
-      </Header>
+    <div className="dao-app">
+      <div className="background-shapes">
+        <div className="shape shape-1" />
+        <div className="shape shape-2" />
+      </div>
       
-      <CardsGrid>
-        {Object.values(DAO_TYPES).map((dao) => (
-          <DaoCard key={dao.id} $color={dao.color}>
-            <GradientOverlay $color={dao.color} />
-            <CardIcon>{dao.icon}</CardIcon>
-            <CardTitle>{dao.name}</CardTitle>
-            <CardDescription>{dao.description}</CardDescription>
-            <CardButton onClick={() => handleDaoSelect(dao.id)}>
-              Create {dao.name}
-            </CardButton>
-          </DaoCard>
-        ))}
-      </CardsGrid>
-    </HomePageContainer>
+      <div className="content">
+        <section className="hero">
+          <h1 className="hero-title">
+            Welcome to DAO Platform
+          </h1>
+          <p className="hero-subtitle">
+            Choose your DAO type to begin your decentralized journey
+          </p>
+        </section>
+
+        <div className="dao-list">
+          {Object.values(DAO_TYPES).map((dao) => (
+            <div key={dao.id} className="dao-item">
+              <div className="dao-icon-wrapper">
+                <div className="dao-icon">
+                  {dao.icon}
+                </div>
+              </div>
+              <div className="dao-content">
+                <h2 className="dao-title">{dao.name}</h2>
+                <p className="dao-description">{dao.description}</p>
+                <button
+                  className="dao-button"
+                  onClick={() => handleDaoSelect(dao.id)}
+                >
+                  Create {dao.name}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 };
 
