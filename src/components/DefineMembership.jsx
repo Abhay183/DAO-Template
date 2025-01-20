@@ -729,14 +729,15 @@ const DefineMembership = () => {
                 isSelected={formData.membershipType === 'token'}
                 onClick={() => handleMembershipTypeChange('token')}
               >
-                <input
+                <Radio
                   type="radio"
+                  name="membershipType"
                   checked={formData.membershipType === 'token'}
-                  onChange={() => { }}
+                  onChange={() => handleMembershipTypeChange('token')}
                 />
                 <RadioContent>
-                  <h4>Token holders</h4>
-                  <p>Tokens act as voting chips. The more tokens you hold, the more weight your vote has.</p>
+                  <h4>Token Holders</h4>
+                  <p>Each token counts as one vote.</p>
                 </RadioContent>
               </RadioOption>
 
